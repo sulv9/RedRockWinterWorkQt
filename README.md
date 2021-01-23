@@ -9,7 +9,7 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
 
   - v0.1.2.1 效果图：
 
-    <img src="screenshot\v0.1.2.1.jpg" alt="v0.1.2.1" width="200" height="400" align="left"/>
+    <img src="screenshot\v0.1.2.1.jpg" alt="v0.1.2.1" width="200" height="400" />
 
 - Toolbar：
 
