@@ -25,4 +25,3 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
 
   - `activity_main.xml`最外层的布局为`CoordinatorLayout`，要在NestedScrollView中添加行为属性与Toolbar的行为对应：`app:layout_behavior="@string/appbar_scrolling_view_behavior"`。
   - 设置`android:fillViewport="true"`属性以保证ScrollView可以全屏显示。
-
