@@ -9,5 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="lead_white">#f0f0f4</color>
     <color name="theme">#f47983</color> <!-- 桃红色 -->
-    <color name="grey">#c2ccd0</color>
+    <color name="grey">#c2ccd0</color> <!-- 花白色-->
 </resources>

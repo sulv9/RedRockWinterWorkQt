@@ -1,4 +1,3 @@
-
 package com.aefottt.redrockwinterworkqt;
 
 import android.os.Build;
@@ -30,7 +29,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ViewPager vpMain;
 
     private static final String[] titles = { "导航", "首页", "广场", "问答", "项目", "体系", "公众号" };
-    private ArrayList<Fragment> fList;
     private NormalVpAdapter vpAdapterMain;
 
     @Override
@@ -58,7 +56,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             tbMain.addTab(tbMain.newTab().setText(title));
         }
         //添加Fragment
-        fList = new ArrayList<>();
+        ArrayList<Fragment> fList = new ArrayList<>();
         fList.add(new NaviFragment());
         fList.add(new IndexFragment());
         fList.add(new UserArticleFragment());
