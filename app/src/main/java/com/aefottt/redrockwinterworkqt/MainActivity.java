@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.aefottt.redrockwinterworkqt.adapter.NormalVpAdapter;
+import com.aefottt.redrockwinterworkqt.base.BaseActivity;
 import com.aefottt.redrockwinterworkqt.fragment.IndexFragment;
 import com.aefottt.redrockwinterworkqt.fragment.NaviFragment;
 import com.aefottt.redrockwinterworkqt.fragment.ProjectFragment;

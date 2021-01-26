@@ -45,7 +45,14 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
       2. 上面那个Bug虽被解决了，但是新的Bug又出现了。但我把手机锁屏后再打开时，RecyclerView就停止更新了。这是因为在锁屏后会调用`onPause()`方法，但同时在解锁后会调用Fragment的`onResume()`方法重新绘制界面，所以我们需要在onResume()中添加判断，`if(!handler.hasMessage()) handler.sendEmptyMessageDelay()`。
       3. 参考了一些前辈们的写法，我新增了一个**isAutoPlay的全局布尔变量**，在onResume中设置其为true，在onPause中设置其为false，在Handler中加一个判断，如果isAutoPlay为true则滑动界面（但是不管isAutoPlay是否为true，只要Handler存在它都要重复执行），然后为RecyclerView添加滑动监听事件`addOnScrollListener()`，在其滑动的时候设置isAutoPlay为false，滑动结束后设置isAutoPlay为true。
       4. 最后也是最让我头疼的一个Bug，但没想到它可以很轻松地解决。就是我们在一开始加载Banner的时候得让它`scrollToPosition(1000*bannerList.size())`，避免用户刚进入app时向左滑动Banner为空的情况。可是这个方法不能直接放在Fragment的`onCreateView()`方法中，因为只有当BannerList加载完成后我们才能顺利移动Position，因此要把初始化并移动位置的代码**放到加载Banner网络图片的Handler中**去，加载完成后再移动。
-    - **最后就是指示器的问题了。**要在fragment中新加一个LinearLayout布局为指示器的容器（我一开始把它加到了RecyclerView的Item布局中去了，最后代码中find不了它的id）。初始化Indicator：通过for循环新增View`indicatorContainer.addView(view)`。改变Indicator状态：先循环将所有childView设置为花白色，然后再将`mCurrentBannerPosition % bannerList.size()`位置的View设置为桃红色。除了这些还需要注意的是addIndicator()和setIndicator()都要和上面自动播放的第四个bug一样放到加载Banner图片的Handler中去才能生效，否则会报错提示找不到childView。
+    - **最后就是指示器的问题了**。要在fragment中新加一个LinearLayout布局为指示器的容器（我一开始把它加到了RecyclerView的Item布局中去了，最后代码中find不了它的id）。初始化Indicator：通过for循环新增View`indicatorContainer.addView(view)`。改变Indicator状态：先循环将所有childView设置为花白色，然后再将`mCurrentBannerPosition % bannerList.size()`位置的View设置为桃红色。除了这些还需要注意的是addIndicator()和setIndicator()都要和上面自动播放的第四个bug一样放到加载Banner图片的Handler中去才能生效，否则会报错提示找不到childView。
 
   - 感想：其实写完后发现轮播图实现起来其实不难，只要思路清晰的话，主要比较麻烦的是一些细节以及处理细节需要掌握的知识，例如对Handler和Fragment生命周期的理解，由于对Handler机制理解的模糊导致自己走了很多看起来sb而且不必要的坑，**基础果然很重要鸭😭**。
+  
+  - **再次更新**：一觉醒来突然想起了mvp架构或许能够优化代码。于时用了一个上午去学mvp，最后写出了一个简陋版的mvp架构来网络请求Banner数据。
+  
+    - M：Model层，即业务层，用于发送网络请求并处理请求后得到的JSON数据，发送给Presenter层。
+    - P：Presenter层，即传递层（中间层），接受Model层传递过来的数据，并通知View层更新。
+    - V：View层，即视图层，主要负责更新UI，对于要处理的数据都交给Presenter来传送给Model处理，最终得到处理后的结果并更新界面。
+    - **MVP的核心是**：View层不持有Model层对象的引用，只持有Presenter层对象的引用，任何需要操作数据的行为都要委托给Presenter层，而Model层也是无法直接操作View层的，也只能委托Presenter层。Presenter层持有View对象的引用，除此之外不持有任何其他UI控件的引用。Model会把更新View的操作委托给Presenter层，而Presenter层会把更新View的操作交给View层对象去操作。
 

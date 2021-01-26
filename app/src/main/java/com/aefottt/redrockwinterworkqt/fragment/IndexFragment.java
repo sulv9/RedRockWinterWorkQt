@@ -1,5 +1,6 @@
 package com.aefottt.redrockwinterworkqt.fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,8 +21,10 @@ import com.aefottt.redrockwinterworkqt.MyApplication;
 import com.aefottt.redrockwinterworkqt.R;
 import com.aefottt.redrockwinterworkqt.adapter.BannerRvAdapter;
 import com.aefottt.redrockwinterworkqt.bean.BannerBean;
+import com.aefottt.redrockwinterworkqt.contract.IndexContract;
 import com.aefottt.redrockwinterworkqt.http.HttpCallbackListener;
 import com.aefottt.redrockwinterworkqt.http.HttpUtil;
+import com.aefottt.redrockwinterworkqt.presenter.IndexPresenter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,12 +32,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class IndexFragment extends Fragment {
+public class IndexFragment extends Fragment implements IndexContract.View {
 
     // 轮播图的载体-RecyclerView
     private RecyclerView rvBanner;
     // 指示器的载体-LinearLayout
     private LinearLayout indicatorContainer;
+
+    // Index的中间层
+    private IndexPresenter mPresenter;
 
     //Banner数据源
     private final ArrayList<BannerBean> bannerList = new ArrayList<>();
@@ -44,14 +50,22 @@ public class IndexFragment extends Fragment {
 
     //获取Banner数据源的Message
     private static final int WHAT_GET_BANNER = 1;
+    //储存BannerList的对象
+    private static final String BUNDLE_KEY_BANNER_LIST = "BannerList";
     //自动播放Banner的Message
     private static final int WHAT_AUTO_PLAY_BANNER = 2;
+
+    //获取首页Banner地址
+    private static final String URL_BANNER = "https://www.wanandroid.com/banner/json";
 
     //当前Banner位置
     private int mCurrentBannerPosition = 0;
 
     //是否自动播放
     private boolean isAutoPlay;
+
+    //加载框
+    private ProgressDialog progressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,12 +76,17 @@ public class IndexFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MyApplication.getContext());
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
         rvBanner.setLayoutManager(linearLayoutManager);
-
         adapter = new BannerRvAdapter(bannerList);
         // 获取Banner数据，要放在适配器初始化之后
-        getBannerData();
-        rvBanner.setAdapter(adapter);
+        // getBannerData();
 
+        // 绑定视图到Presenter上
+        mPresenter = new IndexPresenter();
+        mPresenter.attachView(this);
+        // 通过Presenter获取数据
+        mPresenter.getBannerData(URL_BANNER);
+
+        rvBanner.setAdapter(adapter);
         // 添加RecyclerView滑动监听事件
         rvBanner.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -92,7 +111,7 @@ public class IndexFragment extends Fragment {
                 Log.e("qt", "滑动到" + target + "位置");
                 // 每次滑动更新当前位置以及指示器颜色
                 mCurrentBannerPosition = target;
-                setIndicator();
+                updateIndicator();
                 return target;
             }
         };
@@ -101,35 +120,52 @@ public class IndexFragment extends Fragment {
         return view;
     }
 
+    /**
+     * 这里接收Presenter层传递过来的数据，并开启线程更新UI
+     * @param bannerList 获取到的Banner数据
+     */
+    @Override
+    public void getBannerDataSuccess(ArrayList<BannerBean> bannerList) {
+        Message message = new Message();
+        message.what = WHAT_GET_BANNER;
+        // 通过Bundle传递Parcelable序列化对象
+        Bundle data = new Bundle();
+        data.putParcelableArrayList(BUNDLE_KEY_BANNER_LIST, bannerList);
+        message.setData(data);
+        handler.sendMessage(message);
+    }
+
     private final Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message message) {
             if (message.what == WHAT_GET_BANNER) {
-                //TODO 获取Banner数据
+                // 获取Parcelable序列化对象
+                ArrayList<? extends BannerBean> list = message.getData().getParcelableArrayList(BUNDLE_KEY_BANNER_LIST);
                 bannerList.clear();
-                bannerList.addAll(handlerBannerJSON(message.obj.toString()));
+                bannerList.addAll(list);
+                // 更新Banner数据
                 adapter.notifyDataSetChanged();
                 // 移动到第1000页
                 mCurrentBannerPosition = 1000 * bannerList.size();
                 rvBanner.scrollToPosition(mCurrentBannerPosition);
-                // 添加指示器
-                addIndicator();
+                // 初始化指示器
+                initIndicator();
                 // 设置指示器颜色
-                setIndicator();
+                updateIndicator();
             } else if (message.what == WHAT_AUTO_PLAY_BANNER) {
-                //TODO 更新Banner位置
+                // 更新Banner及指示器位置
                 if (bannerList.size() < 2) {
                     return false;
                 }
                 if (isAutoPlay) {
-                    // 移动到下一个item
+                    // Recycler移动
                     rvBanner.smoothScrollToPosition(++mCurrentBannerPosition);
-                    setIndicator();
+                    // 指示器移动
+                    updateIndicator();
                 }
                 // 重复播放
                 handler.sendEmptyMessageDelayed(WHAT_AUTO_PLAY_BANNER, 3000);
             }
-            //TODO 加载完数据后关闭加载框
             return false;
         }
     });
@@ -137,7 +173,7 @@ public class IndexFragment extends Fragment {
     /**
      * 初始化指示器
      */
-    private void addIndicator() {
+    private void initIndicator() {
         View view;
         for (int i = 0; i < bannerList.size(); i++) {
             view = new View(MyApplication.getContext());
@@ -155,9 +191,9 @@ public class IndexFragment extends Fragment {
     }
 
     /**
-     * 设置指示器颜色
+     * 更新指示器颜色
      */
-    private void setIndicator() {
+    private void updateIndicator() {
         // 先将所有指示器设置为灰色
         for (int i = 0; i < indicatorContainer.getChildCount(); i++) {
             if (i == 0) {
@@ -179,46 +215,6 @@ public class IndexFragment extends Fragment {
         }
     }
 
-    /**
-     * 通过Http网络请求获取Banner数据
-     */
-    private void getBannerData() {
-        // HttpGet获取Banner数据
-        HttpUtil.sendHttpGetRequest("https://www.wanandroid.com/banner/json", new HttpCallbackListener() {
-            @Override
-            public void onResponse(String response) {
-                Message message = new Message();
-                message.what = WHAT_GET_BANNER;
-                message.obj = response;
-                handler.sendMessage(message);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(getContext(), "Banner加载失败！", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
-     * 处理得到的首页广告轮播图Json数据
-     */
-    public static ArrayList<BannerBean> handlerBannerJSON(String response) {
-        ArrayList<BannerBean> bannerList = new ArrayList<>();
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray data = jsonObject.getJSONArray("data");
-            for (int i = 0; i < data.length(); i++) {
-                JSONObject bannerObject = data.getJSONObject(i);
-                bannerList.add(new BannerBean(bannerObject.getString("imagePath"),
-                        bannerObject.getString("url")));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return bannerList;
-    }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -238,4 +234,33 @@ public class IndexFragment extends Fragment {
             handler.sendEmptyMessageDelayed(WHAT_AUTO_PLAY_BANNER, 3000);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.detachView();
+    }
+
+    @Override
+    public void showLodaing() {
+        if (progressDialog == null){
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("加载中...");
+            progressDialog.setCanceledOnTouchOutside(false);
+        }
+        progressDialog.show();
+    }
+
+    @Override
+    public void hideLoading() {
+        if (progressDialog != null){
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+        Log.e("WanAndroid", "加载失败："+throwable.toString());
+    }
+
 }

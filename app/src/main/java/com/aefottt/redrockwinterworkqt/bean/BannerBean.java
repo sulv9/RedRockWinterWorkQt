@@ -1,13 +1,36 @@
 package com.aefottt.redrockwinterworkqt.bean;
 
-public class BannerBean {
-    private String imagePath;
-    private String url;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+/**
+ * 继承自Parcelable，使对象可以通过Intent和Bundle传递
+ */
+public class BannerBean implements Parcelable {
+    private final String imagePath;
+    private final String url;
 
     public BannerBean(String imagePath, String url) {
         this.imagePath = imagePath;
         this.url = url;
     }
+
+    protected BannerBean(Parcel in) {
+        imagePath = in.readString();
+        url = in.readString();
+    }
+
+    public static final Creator<BannerBean> CREATOR = new Creator<BannerBean>() {
+        @Override
+        public BannerBean createFromParcel(Parcel in) {
+            return new BannerBean(in);
+        }
+
+        @Override
+        public BannerBean[] newArray(int size) {
+            return new BannerBean[size];
+        }
+    };
 
     public String getImagePath() {
         return imagePath;
@@ -15,5 +38,16 @@ public class BannerBean {
 
     public String getUrl() {
         return url;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(imagePath);
+        parcel.writeString(url);
     }
 }
