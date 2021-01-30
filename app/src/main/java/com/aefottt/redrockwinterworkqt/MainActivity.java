@@ -15,7 +15,6 @@ import com.aefottt.redrockwinterworkqt.fragment.IndexFragment;
 import com.aefottt.redrockwinterworkqt.fragment.NaviFragment;
 import com.aefottt.redrockwinterworkqt.fragment.ProjectFragment;
 import com.aefottt.redrockwinterworkqt.fragment.TreeFragment;
-import com.aefottt.redrockwinterworkqt.fragment.UserArticleFragment;
 import com.aefottt.redrockwinterworkqt.fragment.WendaFragment;
 import com.aefottt.redrockwinterworkqt.fragment.WxarticleFragment;
 import com.google.android.material.tabs.TabLayout;
@@ -29,8 +28,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TabLayout tbMain;
     private ViewPager vpMain;
 
-    private static final String[] titles = { "导航", "首页", "广场", "问答", "项目", "体系", "公众号" };
+    private static final String[] titles = { "导航", "体系", "首页", "问答", "项目", "公众号" };
     private NormalVpAdapter vpAdapterMain;
+
+    private IndexFragment indexFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +47,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         initData();
 
         vpMain.setAdapter(vpAdapterMain);
-        vpMain.setCurrentItem(1);
+        vpMain.setCurrentItem(2);
         tbMain.setupWithViewPager(vpMain);
-    }
+        tbMain.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                indexFragment.rvArticle.smoothScrollToPosition(0);
+            }
+        });
+    }
+    
     @Override
     protected void initData() {
         //添加Tab
@@ -57,13 +71,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             tbMain.addTab(tbMain.newTab().setText(title));
         }
         //添加Fragment
+        indexFragment = new IndexFragment();
         ArrayList<Fragment> fList = new ArrayList<>();
         fList.add(new NaviFragment());
-        fList.add(new IndexFragment());
-        fList.add(new UserArticleFragment());
+        fList.add(new TreeFragment());
+        fList.add(indexFragment);
         fList.add(new WendaFragment());
         fList.add(new ProjectFragment());
-        fList.add(new TreeFragment());
         fList.add(new WxarticleFragment());
         //初始化VpAdapter
         vpAdapterMain = new NormalVpAdapter(getSupportFragmentManager(),

@@ -14,5 +14,5 @@ public interface BaseView {
     /**
      * 加载失败
      */
-    void onError(Throwable throwable);
+    void onError(Exception e);
 }

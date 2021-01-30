@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHolder>{
+public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHolder> {
     private final ArrayList<BannerBean> bannerList;
 
     public BannerRvAdapter(ArrayList<BannerBean> bannerList) {
@@ -26,7 +26,7 @@ public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHo
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new viewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_main_banner, parent, false));
+                .inflate(R.layout.item_banner_index, parent, false));
     }
 
     @Override
@@ -37,9 +37,9 @@ public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHo
 
     @Override
     public int getItemCount() {
-        if (bannerList.size() == 0){
+        if (bannerList.size() == 0) {
             return 0;
-        }else if (bannerList.size() == 1){
+        } else if (bannerList.size() == 1) {
             return 1;
         }
         return Integer.MAX_VALUE;
@@ -52,7 +52,7 @@ public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHo
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             iv = itemView.findViewById(R.id.iv_banner);
-            itemView.setOnClickListener((view)->{
+            itemView.setOnClickListener((view) -> {
                 //TODO 点击跳转对应的url
                 BannerBean bean = bannerList.get(getAdapterPosition() % bannerList.size());
             });

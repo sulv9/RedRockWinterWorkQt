@@ -1,6 +1,15 @@
-# WanAndroid-RedRockWinterWorkQt
+
+
+# 待优化的地方：
+
+1.  添加全局的加载Dialog动画（现在v0.1.2.3版本首页加载数据的时候一片空白，无加载动画）
+2. 将下拉刷新和上滑加载的RecyclerView封装为SwipeRecycler类，方便后续开发（v0.1.2.3版本的首页Recycler是暴力向Adapter中添加头部和底部View，然后在Fragment中编写对应监听事件的，耦合度较高，不便于二次利用）
+3. 添加TabLayout指示器动画，Indicator随着手指的滑动有一个变长再变短的效果
+4. 实现缓存预加载内容，每次网络请求完成后通过Sp保存数据，下次进入app时如果当前没有最新数据，则加载上一次保存过的数据，提高用户体验感
+5. 在首页文章的Item中为其添加自定义的分类标签TextView（如“最新”， “置顶”， “项目”）
 
 # 更新日志：
+
 v0.1.1: 更新启动页，加了点动画特效
 
 v0.1.2: 更新主界面内容，界面设计借鉴掘金app
@@ -31,7 +40,7 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
 
   - 涉及到的技术：HttpUrlConnection方法封装，RecyclerView+PagerSnapHelper实现轮播图，Handler的使用，Fragment生命周期的理解，动态添加View。效果图：
 
-    <img src="screenshot\v0.1.2.2.gif" alt="v0.1.2.1" width="200" height="440" />
+    <img src="screenshot\v0.1.2.2.gif" alt="v0.1.2.2" width="200" height="440" />
 
   - HttpUrlConnection方法封装：
 
@@ -55,4 +64,15 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
     - P：Presenter层，即传递层（中间层），接受Model层传递过来的数据，并通知View层更新。
     - V：View层，即视图层，主要负责更新UI，对于要处理的数据都交给Presenter来传送给Model处理，最终得到处理后的结果并更新界面。
     - **MVP的核心是**：View层不持有Model层对象的引用，只持有Presenter层对象的引用，任何需要操作数据的行为都要委托给Presenter层，而Model层也是无法直接操作View层的，也只能委托Presenter层。Presenter层持有View对象的引用，除此之外不持有任何其他UI控件的引用。Model会把更新View的操作委托给Presenter层，而Presenter层会把更新View的操作交给View层对象去操作。
+  
+- v0.1.2.3: 
 
+  - **2020.1.30** 更新首页文章列表，为RecyclerView的Adapter添加了四个部分的View，分别是REFRESH_VIEW(下拉刷新View)，BANNER_VIEW（轮播图View），ARTICLE_VIEW（文章列表View），FOOTER_VIEW（底部加载View）。效果图：
+
+    <img src="screenshot\0.1.2.3.gif" width="200" height="440" />
+
+  - 首先要将BannerRecycler添加到文章Recycler的Adapter中，也即IndexFragment中只有一个RecyclerView。需要先在onCreateViewHolder()和getItemType()两个方法中加载BannerView及初始化指示器，然后onBindViewHolder()中给rvBanner初始化一些滑动监听事件，并在Adapter里创建一个Banner接口，在onBindView中回调接口使Banner自动滚动，在IndexFragment中添加接口监听事件。
+
+  - 然后在头部添加刷新View，在底部添加加载View。刷新View需要为rvArticle设置触摸事件(setOnTouchListener())，在DOWN中记录下手指坐标，在MOVE中判断滑动距离，**核心思想是通过改变refreshView的topMargin来实现下拉显示刷新View的**。底部加载View是通过recycler的滑动监听事件(addOnScrollListener())实现，如果recycler处于滑动或者闲置状态时，通过其layoutManager判断是否为最后一条Item，如果是则显示FooterView，并开启线程加载下一页的数据，在加载完成后在让其消失。
+
+  - 其他的没啥好说的了，因为要在adapter里面额外添加三个不同的view，还要设置各自不同的监听事件，中间遇到的Bug数都数不清了，这里说两个我记得比较清楚的，**第一个是设置recycler的TouchListener来获取Y轴坐标的**，这个要注意一开始getRawY()放在哪里，这里我参考网上放在了最外面，但如果放到DOWN里面获取的话会出一些问题，需要提前return true，这是个说不清的坑，具体的原因我也没搞太懂。第二个是在切换界面的时候adapter会被绑定到两个recyclerview上导致`FATAL EXCEPTION: divide by zero`，也就是每次在获取Banner的线程中都要对adapter进行初始化才行，不能添加if(adapter == null)，这个具体解决方案参考 第 #2796 issue，https://github.com/CymChad/BaseRecyclerViewAdapterHelper/issues/2796.

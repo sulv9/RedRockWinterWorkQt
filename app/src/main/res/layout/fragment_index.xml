@@ -1,31 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.IndexFragment">
+    tools:context=".fragment.IndexFragment"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_index_article"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_margin="15dp">
+        android:layout_height="match_parent"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_index_banner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <LinearLayout
-            android:id="@+id/ll_banner_dots"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_indicator_banner">
-        </LinearLayout>
-
-    </RelativeLayout>
-
-</FrameLayout>
+</LinearLayout>

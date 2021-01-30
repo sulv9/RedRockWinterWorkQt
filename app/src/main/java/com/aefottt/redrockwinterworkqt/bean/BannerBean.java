@@ -3,9 +3,6 @@ package com.aefottt.redrockwinterworkqt.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * 继承自Parcelable，使对象可以通过Intent和Bundle传递
- */
 public class BannerBean implements Parcelable {
     private final String imagePath;
     private final String url;
