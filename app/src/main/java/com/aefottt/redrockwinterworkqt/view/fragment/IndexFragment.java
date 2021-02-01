@@ -56,7 +56,7 @@ public class IndexFragment extends Fragment implements IndexContract.View {
     // 加载失败线程的Message
     private static final int WHAT_LOAD_FAIL = 5;
     // Banner自动播放时间间隔
-    private static final int AUTO_PLAY_TIME = 2600;
+    private static final int AUTO_PLAY_TIME = 2800;
 
     // 储存BannerList的BundleKey值
     private static final String BUNDLE_KEY_BANNER_LIST = "BannerList";
@@ -384,6 +384,9 @@ public class IndexFragment extends Fragment implements IndexContract.View {
         if (handler.hasMessages(WHAT_AUTO_PLAY_BANNER)) {
             handler.removeMessages(WHAT_AUTO_PLAY_BANNER, tempMessageObj);
             tempMessageObj = null;
+        }
+        if (!handler.hasMessages(WHAT_GET_BANNER_DATA)){
+            mPresenter.onLoadBannerData(URL_BANNER);
         }
     }
 
