@@ -1,8 +1,8 @@
 package com.aefottt.redrockwinterworkqt.contract;
 
 import com.aefottt.redrockwinterworkqt.base.BaseView;
-import com.aefottt.redrockwinterworkqt.bean.BannerBean;
-import com.aefottt.redrockwinterworkqt.bean.IndexArticleBean;
+import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
+import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.model.IndexModelCallback;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public interface IndexContract {
 
         void getBannerDataSuccess(ArrayList<BannerBean> bannerList);
 
-        void getArticleDataSuccess(ArrayList<IndexArticleBean> articleList);
+        void getArticleDataSuccess(ArrayList<ArticleBean> articleList);
     }
 
     /**

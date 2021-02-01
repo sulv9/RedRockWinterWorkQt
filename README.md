@@ -3,8 +3,8 @@
 # 待优化的地方：
 
 1.  添加全局的加载Dialog动画（现在v0.1.2.3版本首页加载数据的时候一片空白，无加载动画）
-2. 将下拉刷新和上滑加载的RecyclerView封装为SwipeRecycler类，方便后续开发（v0.1.2.3版本的首页Recycler是暴力向Adapter中添加头部和底部View，然后在Fragment中编写对应监听事件的，耦合度较高，不便于二次利用）
-3. 添加TabLayout指示器动画，Indicator随着手指的滑动有一个变长再变短的效果
+2. 将下拉刷新和上滑加载的RecyclerView封装为SwipeRecycler类，方便后续开发（v0.1.2.3版本的首页Recycler是暴力向Adapter中添加头部和底部View，然后在Fragment中编写对应监听事件的，耦合度较高，不便于二次利用）--- 暂时无法实现😭
+3. 添加TabLayout指示器动画，Indicator随着手指的滑动有一个变长再变短的效果（可能需要通过反射重写Indicator效果，有些麻烦）
 4. 实现缓存预加载内容，每次网络请求完成后通过Sp保存数据，下次进入app时如果当前没有最新数据，则加载上一次保存过的数据，提高用户体验感
 5. 在首页文章的Item中为其添加自定义的分类标签TextView（如“最新”， “置顶”， “项目”）
 
@@ -69,10 +69,22 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
 
   - **2020.1.30** 更新首页文章列表，为RecyclerView的Adapter添加了四个部分的View，分别是REFRESH_VIEW(下拉刷新View)，BANNER_VIEW（轮播图View），ARTICLE_VIEW（文章列表View），FOOTER_VIEW（底部加载View）。效果图：
 
-    <img src="screenshot\0.1.2.3.gif" width="200" height="440" />
+    <img src="screenshot\v0.1.2.3.gif" width="200" height="440" />
 
   - 首先要将BannerRecycler添加到文章Recycler的Adapter中，也即IndexFragment中只有一个RecyclerView。需要先在onCreateViewHolder()和getItemType()两个方法中加载BannerView及初始化指示器，然后onBindViewHolder()中给rvBanner初始化一些滑动监听事件，并在Adapter里创建一个Banner接口，在onBindView中回调接口使Banner自动滚动，在IndexFragment中添加接口监听事件。
 
   - 然后在头部添加刷新View，在底部添加加载View。刷新View需要为rvArticle设置触摸事件(setOnTouchListener())，在DOWN中记录下手指坐标，在MOVE中判断滑动距离，**核心思想是通过改变refreshView的topMargin来实现下拉显示刷新View的**。底部加载View是通过recycler的滑动监听事件(addOnScrollListener())实现，如果recycler处于滑动或者闲置状态时，通过其layoutManager判断是否为最后一条Item，如果是则显示FooterView，并开启线程加载下一页的数据，在加载完成后在让其消失。
 
   - 其他的没啥好说的了，因为要在adapter里面额外添加三个不同的view，还要设置各自不同的监听事件，中间遇到的Bug数都数不清了，这里说两个我记得比较清楚的，**第一个是设置recycler的TouchListener来获取Y轴坐标的**，这个要注意一开始getRawY()放在哪里，这里我参考网上放在了最外面，但如果放到DOWN里面获取的话会出一些问题，需要提前return true，这是个说不清的坑，具体的原因我也没搞太懂。第二个是在切换界面的时候adapter会被绑定到两个recyclerview上导致`FATAL EXCEPTION: divide by zero`，也就是每次在获取Banner的线程中都要对adapter进行初始化才行，不能添加if(adapter == null)，这个具体解决方案参考 第 #2796 issue，https://github.com/CymChad/BaseRecyclerViewAdapterHelper/issues/2796.
+  
+- v0.1.2.4更新：
+
+  - 此次更新主要涉及到两层TabLayout监听事件的设置，以及解析相应的网络请求数据。（这点用MVP架构是真的香啊，处理数据的请求直接由Presenter提交了，只需要把回调事件写好就可以了。）效果图：
+
+    <img src="screenshot\v0.1.2.4.gif" width="200" height="440" />
+
+  - 这里基本没啥技术难度，就只需要为TabLayout`addOnTabSelectedListener`就可以了，其中加载数据的时候可以通过`tab.setTag()`这个方法储存每个Tab对应的数据(Bean)，然后在监听事件中通过Tag获取每页文章对应的Id，拼接在URL后面再发送更新Recycler列表的请求就OK了。
+
+  - 比较坑的是，我花了一个下午想来封装一个可以上滑加载下拉刷新(下拉刷新要自定义，不用Google提供的SwipeLayout，那个刷新感觉太丑了)的RecyclerView，结果呢，我大意了呀，没有料到这么复杂，结果写了一个下午白写了。理论上来讲上滑加载和下拉刷新的代码基本上都是一样的操作，完全可以剖离出来，可是由于RecyclerView这个控件的特殊之处，我们不能直接写一个View继承自RecyclerView，我看网上好多大佬都是自定义一个继承自LinearLayout或者FrameLayout的View，然后内部新建一个RecyclerView变量，同时还要提供一些RecyclerView常用到的方法的接口，然后还要写一个**配套的Adapter**，因为顶部刷新和底部加载的两个布局都属于Recycler的两个特殊Item，需要LayoutManager，RecyclerView.Adapter以及RecyclerView三者的配合才能写出来，我感觉如果要达到我想要的这个效果的话，工程量会非常大😂。所以就暂时避开了这个坑，直接再次对体系界面里面的RecyclerView重写`onTouchListener()`事件实现下拉刷新功能。
+
+  - 不过这次重写下拉刷新功能的时候感觉自己的代码变得精简了一些，相比与`IndexFragment.java`中的冗杂一堆让人看着就头疼的代码，这次`TreeFragment.java`中的代码写的更熟练，思路更清晰了一些，通过将多行代码分离成函数使得代码整体更加美观了些，也更加明确了从网络请求到加载数据这个过程中各个部分的分工。

@@ -10,4 +10,5 @@
     <color name="lead_white">#f0f0f4</color>
     <color name="theme">#f47983</color> <!-- 桃红色 -->
     <color name="grey">#c2ccd0</color> <!-- 花白色-->
+    <color name="gray">#808080</color> <!-- 灰色-->
 </resources>

@@ -1,7 +1,7 @@
 package com.aefottt.redrockwinterworkqt.model;
 
-import com.aefottt.redrockwinterworkqt.bean.BannerBean;
-import com.aefottt.redrockwinterworkqt.bean.IndexArticleBean;
+import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
+import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ public class IndexModelCallback {
         void onFail(Exception e);
     }
     public interface ArticleModelCallback{
-        void onSuccess(ArrayList<IndexArticleBean> beans);
+        void onSuccess(ArrayList<ArticleBean> beans);
         void onFail(Exception e);
     }
 }

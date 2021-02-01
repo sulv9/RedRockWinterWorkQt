@@ -1,8 +1,8 @@
 package com.aefottt.redrockwinterworkqt.presenter;
 
 import com.aefottt.redrockwinterworkqt.base.BasePresenter;
-import com.aefottt.redrockwinterworkqt.bean.BannerBean;
-import com.aefottt.redrockwinterworkqt.bean.IndexArticleBean;
+import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
+import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.contract.IndexContract;
 import com.aefottt.redrockwinterworkqt.model.IndexModel;
 import com.aefottt.redrockwinterworkqt.model.IndexModelCallback;
@@ -52,7 +52,7 @@ public class IndexPresenter extends BasePresenter<IndexContract.View> implements
         // 获取Article数据
         model.getArticleData(articleUrl, new IndexModelCallback.ArticleModelCallback() {
             @Override
-            public void onSuccess(ArrayList<IndexArticleBean> beans) {
+            public void onSuccess(ArrayList<ArticleBean> beans) {
                 mView.getArticleDataSuccess(beans);
             }
             @Override

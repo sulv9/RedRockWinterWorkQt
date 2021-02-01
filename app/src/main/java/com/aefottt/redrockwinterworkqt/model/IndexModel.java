@@ -1,10 +1,10 @@
 package com.aefottt.redrockwinterworkqt.model;
 
-import com.aefottt.redrockwinterworkqt.bean.BannerBean;
-import com.aefottt.redrockwinterworkqt.bean.IndexArticleBean;
+import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
+import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.contract.IndexContract;
-import com.aefottt.redrockwinterworkqt.http.HttpCallbackListener;
-import com.aefottt.redrockwinterworkqt.http.HttpUtil;
+import com.aefottt.redrockwinterworkqt.util.http.HttpCallbackListener;
+import com.aefottt.redrockwinterworkqt.util.http.HttpUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,8 +73,8 @@ public class IndexModel implements IndexContract.Model {
     /**
      * 处理得到的文章JSON数据
      */
-    public ArrayList<IndexArticleBean> handleArticleJSON(String response){
-        ArrayList<IndexArticleBean> articleList = new ArrayList<>();
+    public ArrayList<ArticleBean> handleArticleJSON(String response){
+        ArrayList<ArticleBean> articleList = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONObject data = jsonObject.getJSONObject("data");
@@ -82,7 +82,7 @@ public class IndexModel implements IndexContract.Model {
             for (int i = 0;i < datas.length();i++){
                 JSONObject articleObject = datas.getJSONObject(i);
                 String author = articleObject.getString("author");
-                articleList.add(new IndexArticleBean(
+                articleList.add(new ArticleBean(
                         "".equals(author) ? articleObject.getString("shareUser") : author, //作者
                         articleObject.getString("niceShareDate"), //分享时间
                         articleObject.getString("title"), //标题
