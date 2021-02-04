@@ -201,10 +201,12 @@ public class IndexFragment extends Fragment implements IndexContract.View {
                     int lastItem = articleManager.findLastCompletelyVisibleItemPosition();
                     if (lastItem == countItem - 1 && bannerList.size() > 1) {
                         footerView.setVisibility(View.VISIBLE);
-                        // 页数加1
-                        mCurrentArticlePage++;
-                        // 更新数据
-                        mPresenter.onLoadArticleData(URL_ARTICLE_HEAD + mCurrentArticlePage + URL_ARTICLE_TAIL);
+                        new Handler().postDelayed(() -> {
+                            // 页数加1
+                            mCurrentArticlePage++;
+                            // 更新数据
+                            mPresenter.onLoadArticleData(URL_ARTICLE_HEAD + mCurrentArticlePage + URL_ARTICLE_TAIL);
+                        }, 600);
                     }
                 }
             }

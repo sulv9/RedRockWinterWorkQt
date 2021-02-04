@@ -110,3 +110,9 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
     - 然后就是第三点提到的Bug了，有很多很多，我就只说最后比较关键的吧，这个是因为我滑动监听事件是在onScroll()里面写的，所以每次点击滑倒对应位置时会出现其他Item也被选中的情况，所以我们需要两个全局变量监听点击结果，一个为isClickMoving记录现在右侧Recycler是否为点击的滑倒，如果为true，onScroll()里面的方法就不执行。另一个变量为clickPosition记录点击Item的位置，然后我们还需要重写右侧滑倒监听事件的`onScrollStateChanged()`方法，如果isMoving为true并且此时处于闲置状态，设置isMoving为false并且设置上一个点击的Item为未选中状态，然后更新`lastItemPosition = clickPosition`。到此左右联动的Recycler差不多就结束了，不过其实中间真的会出现很多很多奇怪的Bug。
 
   - 感想：写代码能力加强了，相比于写首页Banner，并且把Banner添加到RecyclerView的适配器中去，最后还要在里面加个下滑刷新上拉加载功能，这些我一开始写了一个星期，但是这次的双列表联动Recycler其实网上的资料并不多，而且还不是我想要的那种效果，虽然花了两天时间才写出个勉勉强强可以看的成果，但还是有些菜了，不过比一开始进步了不少。还要我这三个界面一直都在围绕着RecyclerView来写，所以对Recycler的缓存理解也加深了不少。
+  
+- v0.1.2.6更新问答界面，很简单没啥好说的，由于写首页的基础，这页很快就写完了，只有一个Recycler+刷新和加载Item。
+
+  效果图：
+
+  <img src="screenshot\v0.1.2.6.gif" width="200" height="440" />

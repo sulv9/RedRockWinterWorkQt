@@ -1,5 +1,6 @@
 package com.aefottt.redrockwinterworkqt.data.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,12 +37,12 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        if (viewType == IndexArticleRecyclerAdapter.VIEW_TYPE.REFRESH_VIEW.ordinal()){
+        if (viewType == VIEW_TYPE.REFRESH_VIEW.ordinal()){
             RecyclerView.LayoutParams headerParams = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, Utility.dpToPx(80));
             headerParams.topMargin = -Utility.dpToPx(80);
             refreshView.setLayoutParams(headerParams);
             return new RecyclerView.ViewHolder(refreshView) {};
-        }else if (viewType == IndexArticleRecyclerAdapter.VIEW_TYPE.FOOTER_VIEW.ordinal() && footerView != null){
+        }else if (viewType == VIEW_TYPE.FOOTER_VIEW.ordinal() && footerView != null){
             footerView.setVisibility(View.GONE);
             return new RecyclerView.ViewHolder(footerView) {};
         }else { // 中间文章布局
@@ -75,7 +76,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public int getItemViewType(int position) {
         if (position == 0){
             return VIEW_TYPE.REFRESH_VIEW.ordinal();
-        }else if (position == aList.size() + 1 && footerView != null){
+        }else if (position == aList.size() && footerView != null){
             return VIEW_TYPE.FOOTER_VIEW.ordinal();
         }else {
             return VIEW_TYPE.ARTICLE_VIEW.ordinal();
@@ -84,10 +85,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public int getItemCount() {
-        if (footerView == null){
-            return aList.size() + 1;
-        }
-        return aList.size() + 2;
+        return aList.size() + 1;
     }
 
     public static class ArticleViewHolder extends RecyclerView.ViewHolder {
