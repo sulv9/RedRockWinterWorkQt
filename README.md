@@ -116,3 +116,11 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
   效果图：
 
   <img src="screenshot\v0.1.2.6.gif" width="200" height="440" />
+  
+- v0.1.2.7更新项目和公众号界面，和前面的体系界面差不多，套模板cv很快，只需要改个网址就可以了。
+
+  效果图：
+
+  <img src="screenshot\v0.1.2.7.gif" width="200" height="440" />
+
+  
