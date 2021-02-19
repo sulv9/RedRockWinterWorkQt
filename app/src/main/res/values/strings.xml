@@ -4,4 +4,20 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="item_rv_loading">加载中......</string>
+    <string name="text_login">Login</string>
+    <string name="text_register">Register</string>
+    <string name="text_login_motto1">自信来源于实力\n实力来源于勤奋</string>
+    <string name="text_login_motto2">一帆风顺多没意思\n祝你的人生乘风破浪</string>
+    <string name="text_register_motto1">你眼中的浩瀚星河\n胜过我所见过的山川与河流</string>
+    <string name="text_register_motto2">你眼里的星河灿烂\n是我不曾见过的世外桃源</string>
+    <string name="text_register_motto3">但愿我们疏途陌路\n归来时各自名满江湖</string>
+    <string name="hint_login_username">请输入用户名</string>
+    <string name="hint_login_password">请输入密码</string>
+    <string name="hint_login_password_again">请再次输入密码</string>
+    <string name="text_to_register"><u>没有账号？现在去注册</u></string>
+    <string name="text_to_login"><u>现在去登录吧-></u></string>
+    <string name="text_search_hot">热门搜索</string>
+    <string name="text_login_out">注销</string>
+    <string name="tips_get_non">神木都没有呀~~~</string>
+    <string name="text_searching">正在搜索中...</string>
 </resources>

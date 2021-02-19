@@ -53,7 +53,7 @@ public class WendaFragment extends Fragment implements WendaContract.View {
     private int lastY;
     private final float mDragF = 0.4F;
 
-    private RecyclerView rv;
+    public RecyclerView rv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,6 +103,7 @@ public class WendaFragment extends Fragment implements WendaContract.View {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initRecycler(){
+        // 下拉刷新
         rv.setOnTouchListener((v, e) -> {
             int y = (int) e.getRawY();
             switch (e.getAction()) {
@@ -152,6 +153,7 @@ public class WendaFragment extends Fragment implements WendaContract.View {
             }
             return false;
         });
+        // 上滑加载更多
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -231,7 +233,7 @@ public class WendaFragment extends Fragment implements WendaContract.View {
      */
     private void refreshing() {
         tvRefresh.setText("正在刷新...");
-        ivRefresh.setBackgroundResource(R.mipmap.load);
+        ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
         // 开始刷新
         pageId = 1;
         mPresenter.onLoadWendaData(URL_WENDA_HEAD + pageId + URL_WENDA_TAIL);

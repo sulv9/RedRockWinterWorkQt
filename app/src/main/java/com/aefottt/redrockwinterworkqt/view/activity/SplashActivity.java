@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.animation.Animation;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.CycleInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,8 +24,7 @@ public class SplashActivity extends BaseActivity {
     ImageView iv;
     TextView tv;
 
-    ObjectAnimator ivAnimator, tvAnimator;
-    AnimatorSet animatorSet;
+    ObjectAnimator ivAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +32,7 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         initView();
         initData();
-        animatorSet.start();
+        ivAnimator.start();
         new Handler().postDelayed(() -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             finish();
@@ -45,18 +47,11 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-
         Path ivPath = new Path();
         ivPath.moveTo(0, 0);
-        ivPath.lineTo((float)1.5, (float)1.5);
-        ivPath.lineTo(1, 1);
+        ivPath.lineTo((float)1.2, (float)1.2);
         ivAnimator = ObjectAnimator.ofFloat(iv, "scaleX", "scaleY", ivPath);
-
-        tvAnimator = ObjectAnimator.ofFloat(tv, "alpha", 0, 1)
-                .setDuration(1000);
-
-        animatorSet = new AnimatorSet();
-        animatorSet.playTogether(ivAnimator, tvAnimator);
-        animatorSet.setDuration(1000);
+        ivAnimator.setDuration(1000);
+        ivAnimator.setInterpolator(new BounceInterpolator());
     }
 }

@@ -32,7 +32,8 @@ public class NaviFragment extends Fragment implements NaviContract.view {
 
     private final ArrayList<NaviTreeBean> treeList = new ArrayList<>();
 
-    private RecyclerView rvLeft, rvRight;
+    private RecyclerView rvLeft;
+    public RecyclerView rvRight;
 
     private NaviTreeRecyclerAdapter treeAdapter;
 

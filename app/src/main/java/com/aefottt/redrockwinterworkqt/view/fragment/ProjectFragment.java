@@ -47,7 +47,7 @@ public class ProjectFragment extends Fragment implements ProjectContract.view {
     private static final String BUNDLE_KEY_PROJECT_ARTICLE_DATA = "ProjectArticleData";
 
     private TabLayout tb;
-    private RecyclerView rv;
+    public RecyclerView rv;
 
     private final ArrayList<ArticleBean> articleList = new ArrayList<>();
     private ArticleRecyclerAdapter adapter;
@@ -317,7 +317,7 @@ public class ProjectFragment extends Fragment implements ProjectContract.view {
      */
     private void refreshing() {
         tvRefresh.setText("正在刷新...");
-        ivRefresh.setBackgroundResource(R.mipmap.load);
+        ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
         // 开始刷新
         mCurrentPage = 1;
         mPresenter.onLoadArticleData(URL_PROJECT_ARTICLE_HEAD + mCurrentPage + URL_PROJECT_ARTICLE_TAIL + mCurrentCid);

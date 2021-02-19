@@ -49,7 +49,7 @@ public class TreeFragment extends Fragment implements TreeContract.View {
 
     private TabLayout tbSuperChapter;
     private TabLayout tbChapter;
-    private RecyclerView rvTree;
+    public RecyclerView rvTree;
 
     private final ArrayList<ArticleBean> articleList = new ArrayList<>();
     private ArticleRecyclerAdapter adapter;
@@ -357,7 +357,7 @@ public class TreeFragment extends Fragment implements TreeContract.View {
      */
     private void refreshing() {
         tvRefresh.setText("正在刷新...");
-        ivRefresh.setBackgroundResource(R.mipmap.load);
+        ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
         // 开始刷新
         mPresenter.onRefreshArticle(URL_ARTICLE+currentId);
     }

@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,7 +46,7 @@ public class WxarticleFragment extends Fragment implements WxContract.view {
     private static final String BUNDLE_KEY_WX_ARTICLE_DATA = "WxArticleData";
 
     private TabLayout tb;
-    private RecyclerView rv;
+    public RecyclerView rv;
 
     private final ArrayList<ArticleBean> articleList = new ArrayList<>();
     private ArticleRecyclerAdapter adapter;
@@ -316,7 +315,7 @@ public class WxarticleFragment extends Fragment implements WxContract.view {
      */
     private void refreshing() {
         tvRefresh.setText("正在刷新...");
-        ivRefresh.setBackgroundResource(R.mipmap.load);
+        ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
         // 开始刷新
         mCurrentPage = 1;
         mPresenter.onLoadArticleData(URL_WX_ARTICLE_HEAD + mCurrentCid + "/" + mCurrentPage + URL_WX_ARTICLE_TAIL);

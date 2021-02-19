@@ -169,7 +169,7 @@ public class IndexFragment extends Fragment implements IndexContract.View {
                         footerView.setVisibility(View.GONE);
                         tvRefresh.setText("正在刷新...");
                         animRefreshView(lp.topMargin, 0, 1000);
-                        ivRefresh.setBackgroundResource(R.mipmap.load);
+                        ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
                         new Handler().postDelayed(() -> {
                             tvRefresh.setText("刷新成功！");
                             ivRefresh.setBackgroundResource(R.mipmap.refresh_success);
@@ -372,22 +372,22 @@ public class IndexFragment extends Fragment implements IndexContract.View {
     @Override
     public void onPause() {
         super.onPause();
-//        Log.e("qt", "onPause");
+        Log.e("qt", "onPause");
         // 页面销毁时Banner停止自动播放
         isAutoPlay = false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-//        Log.e("qt", "onResume");
-        isAutoPlay = true;
         // 如果已经存在消息队列（旧消息队列）就将其移除
         if (handler.hasMessages(WHAT_AUTO_PLAY_BANNER)) {
             handler.removeMessages(WHAT_AUTO_PLAY_BANNER, tempMessageObj);
             tempMessageObj = null;
         }
-        if (!handler.hasMessages(WHAT_GET_BANNER_DATA)){
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("qt", "onResume");
+        isAutoPlay = true;
+        if (!handler.hasMessages(WHAT_AUTO_PLAY_BANNER)){
             mPresenter.onLoadBannerData(URL_BANNER);
         }
     }
