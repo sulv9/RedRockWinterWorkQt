@@ -140,3 +140,11 @@ v0.1.2: 更新主界面内容，界面设计借鉴掘金app
 
   - 特别提一点，搜索界面我没用MVP架构了，因为赶时间所以是个精简版的MV结构，只有View层和Model层相互发送数据，因为功能不多，要是再用MVP写的话就太麻烦了。
   - 然后要注意的是流式布局中的子View，要指定其父布局。
+  
+- v0.1.5更新文章界面和网站界面，效果图：
+
+  <img src="screenshot\v0.1.5.gif" width="200" height="440" />
+
+  - Web网站界面有一个LinearLayout和WebView构成，点击EditText出现阴影遮罩。
+  - 文章界面，由WebView和BottomAppBar构成，右下角的FAB绑定在BottomAppBar上，点击评论按钮会有一个弹出的动画并出现阴影遮罩。
+

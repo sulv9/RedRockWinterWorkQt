@@ -3,6 +3,7 @@ package com.aefottt.redrockwinterworkqt.view.fragment;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,6 +25,7 @@ import com.aefottt.redrockwinterworkqt.data.adapter.ArticleRecyclerAdapter;
 import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.presenter.WendaPresenter;
 import com.aefottt.redrockwinterworkqt.util.Utility;
+import com.aefottt.redrockwinterworkqt.view.activity.ArticleActivity;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 
 import java.util.ArrayList;
@@ -91,6 +93,11 @@ public class WendaFragment extends Fragment implements WendaContract.View {
                 adapter = new ArticleRecyclerAdapter(articleBeans);
                 adapter.setRefreshView(refreshView);
                 adapter.setFooterView(footerView);
+                adapter.setArticleListener(url->{
+                    Intent intent = new Intent(getActivity(), ArticleActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
+                });
                 rv.setAdapter(adapter);
             }else if (message.what == WHAT_GET_MORE_DATA){
                 int lastPosition = articleBeans.size() - 1;

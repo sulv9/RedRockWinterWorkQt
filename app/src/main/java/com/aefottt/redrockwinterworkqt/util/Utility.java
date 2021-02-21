@@ -1,10 +1,12 @@
 package com.aefottt.redrockwinterworkqt.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
+import android.view.inputmethod.InputMethodManager;
 
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 
@@ -50,5 +52,13 @@ public class Utility {
         // 销毁Render
         rs.destroy();
         return blurBitmap;
+    }
+
+    /**
+     * 取消软键盘
+     */
+    public static void cancelKeyWord(){
+        InputMethodManager imm = (InputMethodManager) MyApplication.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 }

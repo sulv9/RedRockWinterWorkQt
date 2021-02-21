@@ -1,6 +1,5 @@
 package com.aefottt.redrockwinterworkqt.data.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,8 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aefottt.redrockwinterworkqt.R;
-import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
 import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
+import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
 import com.aefottt.redrockwinterworkqt.util.Utility;
 import com.aefottt.redrockwinterworkqt.view.fragment.IndexFragment;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
@@ -77,6 +76,10 @@ public class IndexArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             bannerManager.setOrientation(RecyclerView.HORIZONTAL);
             bannerHolder.rvBanner.setLayoutManager(bannerManager);
             BannerRvAdapter bannerAdapter = new BannerRvAdapter(bannerList);
+            // 设置Banner点击事件
+            bannerAdapter.setOnClickBannerListener(url -> {
+                bannerListener.onClickBanner(url);
+            });
             bannerHolder.rvBanner.setAdapter(bannerAdapter);
             if (IndexFragment.mCurrentBannerPosition == 0) {
                 // 第一次移动到第1000页
@@ -107,7 +110,6 @@ public class IndexArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 public int findTargetSnapPosition(RecyclerView.LayoutManager layoutManager, int velocityX, int velocityY) {
                     // 当前滑动的项
                     int target = super.findTargetSnapPosition(layoutManager, velocityX, velocityY);
-                    Log.e("qt", "滑动到" + target + "位置");
                     // 每次滑动更新当前位置以及指示器颜色
                     IndexFragment.mCurrentBannerPosition = target;
                     IndexFragment.updateIndicator(bannerHolder.indicatorContainer);
@@ -127,11 +129,24 @@ public class IndexArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
             articleHolder.desc.setText(bean.getDesc());
             articleHolder.superChapter.setText(bean.getSuperChapter());
             articleHolder.chapter.setText(bean.getChapter());
+            articleHolder.collect.setBackgroundResource(R.mipmap.icon_article_dislove);
             String picUrl = bean.getPic();
             if (!"".equals(picUrl)) { // 如果url不为空则加载封面的网络图片
                 Glide.with(MyApplication.getContext())
                         .load(bean.getPic()).into(articleHolder.pic);
             }
+            articleHolder.itemView.setOnClickListener(v->{
+                articleListener.onClickListener(bean.getLink());
+            });
+            articleHolder.collect.setOnClickListener(view -> {
+                if ("dislove".contentEquals((String) view.getTag())){
+                    view.setBackgroundResource(R.mipmap.icon_article_love);
+                    view.setTag("love");
+                }else if ("love".contentEquals((String) view.getTag())){
+                    view.setBackgroundResource(R.mipmap.icon_article_dislove);
+                    view.setTag("dislove");
+                }
+            });
         }
     }
 
@@ -183,12 +198,22 @@ public class IndexArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public interface BannerListener {
         void sendAutoPlayHandler(ArticleViewHolder holder);
+        void onClickBanner(String url);
     }
 
     private BannerListener bannerListener;
 
     public void setBannerListener(IndexArticleRecyclerAdapter.BannerListener bannerListener) {
         this.bannerListener = bannerListener;
+    }
+
+    public interface ArticleListener{
+        void onClickListener(String url);
+    }
+    private ArticleListener articleListener;
+
+    public void setArticleListener(ArticleListener articleListener) {
+        this.articleListener = articleListener;
     }
 
     /**

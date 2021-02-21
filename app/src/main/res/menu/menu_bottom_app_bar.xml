@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_bottom_collect_article"
+        android:icon="@mipmap/icon_article_dislove"
+        app:showAsAction="always"
+        android:title="@string/tv_menu_like" />
+    <item android:id="@+id/menu_bottom_article_share"
+        android:icon="@mipmap/share"
+        app:showAsAction="ifRoom"
+        android:title="@string/tv_menu_share"/>
+    <item android:id="@+id/menu_bottom_comment"
+        android:icon="@mipmap/comment"
+        app:showAsAction="ifRoom"
+        android:title="@string/tv_menu_comment"/>
+</menu>

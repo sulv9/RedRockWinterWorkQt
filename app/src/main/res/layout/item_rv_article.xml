@@ -113,11 +113,12 @@
             android:id="@+id/iv_index_article_collect"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@mipmap/icon_article_dislove"
+            android:background="@mipmap/icon_article_dislove"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:tag="dislove"/>
     </RelativeLayout>
 
 </LinearLayout>

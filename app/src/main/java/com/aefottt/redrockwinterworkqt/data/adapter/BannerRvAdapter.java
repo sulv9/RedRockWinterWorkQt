@@ -33,6 +33,9 @@ public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHo
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Glide.with(MyApplication.getContext())
                 .load(bannerList.get(position % bannerList.size()).getImagePath()).into(holder.iv);
+        holder.iv.setOnClickListener(view -> {
+            onClickBannerListener.onClickBanner(bannerList.get(position % bannerList.size()).getUrl());
+        });
     }
 
     @Override
@@ -59,4 +62,12 @@ public class BannerRvAdapter extends RecyclerView.Adapter<BannerRvAdapter.viewHo
         }
     }
 
+    public interface OnClickBannerListener{
+        void onClickBanner(String url);
+    }
+    private OnClickBannerListener onClickBannerListener;
+
+    public void setOnClickBannerListener(OnClickBannerListener onClickBannerListener) {
+        this.onClickBannerListener = onClickBannerListener;
+    }
 }

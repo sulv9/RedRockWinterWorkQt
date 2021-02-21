@@ -64,11 +64,24 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             articleHolder.desc.setText(bean.getDesc());
             articleHolder.superChapter.setText(bean.getSuperChapter());
             articleHolder.chapter.setText(bean.getChapter());
+            articleHolder.collect.setBackgroundResource(R.mipmap.icon_article_dislove);
             String picUrl = bean.getPic();
             if (!"".equals(picUrl)) { // 如果url不为空则加载封面的网络图片
                 Glide.with(MyApplication.getContext())
                         .load(bean.getPic()).into(articleHolder.pic);
             }
+            articleHolder.itemView.setOnClickListener(v->{
+                articleListener.onClickListener(bean.getLink());
+            });
+            articleHolder.collect.setOnClickListener(view -> {
+                if ("dislove".contentEquals((String) view.getTag())){
+                    view.setBackgroundResource(R.mipmap.icon_article_love);
+                    view.setTag("love");
+                }else if ("love".contentEquals((String) view.getTag())){
+                    view.setBackgroundResource(R.mipmap.icon_article_dislove);
+                    view.setTag("dislove");
+                }
+            });
         }
     }
 
@@ -111,5 +124,14 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public void setFooterView(View footerView) {
         this.footerView = footerView;
+    }
+
+    public interface ArticleListener{
+        void onClickListener(String url);
+    }
+    private ArticleRecyclerAdapter.ArticleListener articleListener;
+
+    public void setArticleListener(ArticleRecyclerAdapter.ArticleListener articleListener) {
+        this.articleListener = articleListener;
     }
 }

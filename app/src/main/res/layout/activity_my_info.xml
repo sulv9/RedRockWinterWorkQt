@@ -77,13 +77,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_gravity="bottom"
-                        app:tabIndicatorColor="@color/theme" />
+                        app:tabIndicatorColor="@color/theme"
+                        app:tabSelectedTextColor="@color/black"/>
                 </androidx.cardview.widget.CardView>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_info"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:background="@color/lead_white"/>
             </LinearLayout>
 
             <com.aefottt.redrockwinterworkqt.view.my.CircleImageView

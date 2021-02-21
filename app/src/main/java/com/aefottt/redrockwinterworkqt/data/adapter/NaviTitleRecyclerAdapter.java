@@ -44,7 +44,11 @@ public class NaviTitleRecyclerAdapter extends RecyclerView.Adapter<NaviTitleRecy
         for (int i = 0; i < titleBeans.size(); i++) {
             TextView tv = (TextView) LayoutInflater.from(MyApplication.getContext())
                     .inflate(R.layout.item_flow_layout, holder.flowLayout, false);
-            tv.setText(titleBeans.get(i).getTitle());
+            NaviTitleBean titleBean = titleBeans.get(i);
+            tv.setText(titleBean.getTitle());
+            tv.setOnClickListener(view -> {
+                articleListener.onClickListener(titleBean.getLink());
+            });
             holder.flowLayout.addView(tv);
         }
     }
@@ -63,5 +67,14 @@ public class NaviTitleRecyclerAdapter extends RecyclerView.Adapter<NaviTitleRecy
             title = itemView.findViewById(R.id.tv_navi_title);
             flowLayout = itemView.findViewById(R.id.flow_layout_navi);
         }
+    }
+
+    public interface ArticleListener{
+        void onClickListener(String url);
+    }
+    private NaviTitleRecyclerAdapter.ArticleListener articleListener;
+
+    public void setArticleListener(NaviTitleRecyclerAdapter.ArticleListener articleListener) {
+        this.articleListener = articleListener;
     }
 }

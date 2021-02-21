@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -68,6 +69,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     private ObjectAnimator anim;
     private int lastY;
     private final float mDragF = 0.4F;
+    private boolean noMoreData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,10 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                     TextView tv = (TextView) LayoutInflater.from(MyApplication.getContext())
                             .inflate(R.layout.item_flow_layout, flHot, false);
                     tv.setText(name);
+                    tv.setOnClickListener(view -> {
+                        etSearch.setText(name);
+                        startSearch();
+                    });
                     flHot.addView(tv);
                 }
             }else if (message.what == WHAT_GET_SEARCH_PAGES){
@@ -133,9 +139,11 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                 rv.setLayoutManager(manager);
                 ArrayList<ArticleBean> articleBeans = message.getData().getParcelableArrayList(BUNDLE_KEY_SEARCH_DATA);
                 if (articleBeans.size() == 0){
+                    noMoreData = true;
                     rv.setVisibility(View.GONE);
                     tvSearchNon.setVisibility(View.VISIBLE);
                 }else {
+                    noMoreData = false;
                     rv.setVisibility(View.VISIBLE);
                     tvSearchNon.setVisibility(View.GONE);
                     // 初始化View
@@ -152,14 +160,21 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                     adapter = new ArticleRecyclerAdapter(articleList);
                     adapter.setRefreshView(refreshView);
                     adapter.setFooterView(footerView);
+                    adapter.setArticleListener(url->{
+                        Intent intent = new Intent(SearchActivity.this, ArticleActivity.class);
+                        intent.putExtra("url", url);
+                        startActivity(intent);
+                    });
                     rv.setAdapter(adapter);
                     setRecycler();
                 }
             }else if (message.what == WHAT_LOAD_MORE){
                 ArrayList<ArticleBean> articleBeans = message.getData().getParcelableArrayList(BUNDLE_KEY_SEARCH_DATA);
                 if (articleBeans.size() == 0){
+                    noMoreData = true;
                     footerView.setVisibility(View.GONE);
                 }else {
+                    noMoreData = false;
                     int startPos = articleList.size() - 1;
                     articleList.addAll(articleBeans);
                     adapter.notifyItemRangeChanged(startPos, articleList.size() - startPos + 1);
@@ -167,6 +182,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
             }else if (message.what == WHAT_REFRESH_DATA){
                 ArrayList<ArticleBean> articleBeans = message.getData().getParcelableArrayList(BUNDLE_KEY_SEARCH_DATA);
                 articleList.clear();
+                noMoreData = false;
                 mCurrentPage = 0;
                 articleList.addAll(articleBeans);
                 adapter.notifyDataSetChanged();
@@ -182,34 +198,41 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.iv_search_go){
-            searchContent = etSearch.getText().toString();
-            if (TextUtils.isEmpty(searchContent)){
-                Toast.makeText(this, "搜索内容不能为空", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            llHot.setVisibility(View.GONE);
-            llResult.setVisibility(View.GONE);
-            llSearching.setVisibility(View.VISIBLE);
-            new Handler().postDelayed(()->{
-                mCurrentPage = 0;
-                searchModel.getSearchPage(URL_SEARCH_HEAD + mCurrentPage + URL_SEARCH_TAIL, searchContent, new SearchModel.getSearchPageCallback() {
-                    @Override
-                    public void onSuccess(ArrayList<ArticleBean> articleBeans) {
-                        Message message = new Message();
-                        message.what = WHAT_GET_SEARCH_PAGES;
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelableArrayList(BUNDLE_KEY_SEARCH_DATA, articleBeans);
-                        message.setData(bundle);
-                        handler.sendMessage(message);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e("getHotNamesError", e.toString());
-                    }
-                });
-            }, 1000);
+            startSearch();
         }
+    }
+
+    /**
+     * 开始搜索业务
+     */
+    private void startSearch(){
+        searchContent = etSearch.getText().toString();
+        if (TextUtils.isEmpty(searchContent)){
+            Toast.makeText(this, "搜索内容不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        llHot.setVisibility(View.GONE);
+        llResult.setVisibility(View.GONE);
+        llSearching.setVisibility(View.VISIBLE);
+        new Handler().postDelayed(()->{
+            mCurrentPage = 0;
+            searchModel.getSearchPage(URL_SEARCH_HEAD + mCurrentPage + URL_SEARCH_TAIL, searchContent, new SearchModel.getSearchPageCallback() {
+                @Override
+                public void onSuccess(ArrayList<ArticleBean> articleBeans) {
+                    Message message = new Message();
+                    message.what = WHAT_GET_SEARCH_PAGES;
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList(BUNDLE_KEY_SEARCH_DATA, articleBeans);
+                    message.setData(bundle);
+                    handler.sendMessage(message);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("getHotNamesError", e.toString());
+                }
+            });
+        }, 1000);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -271,7 +294,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE || newState == RecyclerView.SCROLL_STATE_DRAGGING){
                     int lastItem = manager.findLastCompletelyVisibleItemPosition();
-                    if (lastItem == manager.getItemCount() - 1 && articleList.size() > 5 && !TextUtils.isEmpty(searchContent)){
+                    if (lastItem == manager.getItemCount() - 1 && articleList.size() > 5 && !TextUtils.isEmpty(searchContent) && !noMoreData){
                         footerView.setVisibility(View.VISIBLE);
                         new Handler().postDelayed(() -> {
                             mCurrentPage++;

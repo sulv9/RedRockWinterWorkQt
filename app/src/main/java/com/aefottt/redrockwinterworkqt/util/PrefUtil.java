@@ -110,10 +110,7 @@ public class PrefUtil {
         for (HttpCookie cookie : cookies){
             if (cookie != null){
                 this.put(Utility.FILE_NAME_USER_INFO, Utility.KEY_COOKIE+cookieNum, cookie.toString()+
-                        "="+cookie.getDomain()+"="+cookie.getPath()+
-                        "="+cookie.getComment()+"="+cookie.getCommentURL()+
-                        "="+cookie.getMaxAge()+"="+cookie.getPortlist()+
-                        "="+cookie.getSecure()+"="+cookie.getDiscard()+"="+cookie.getVersion());
+                        "="+cookie.getDomain()+"="+cookie.getPath());
                 cookieNum++;
             }
         }
@@ -133,13 +130,6 @@ public class PrefUtil {
             HttpCookie cookie = new HttpCookie(spiltSession[0], spiltSession[1]);
             cookie.setDomain(spiltSession[2]);
             cookie.setPath(spiltSession[3]);
-            cookie.setComment(spiltSession[4]);
-            cookie.setCommentURL(spiltSession[5]);
-            cookie.setMaxAge(Long.parseLong(spiltSession[6]));
-            cookie.setPortlist(spiltSession[7]);
-            cookie.setSecure(Boolean.parseBoolean(spiltSession[8]));
-            cookie.setDiscard(Boolean.parseBoolean(spiltSession[9]));
-            cookie.setVersion(Integer.parseInt(spiltSession[10]));
             cookies.add(cookie);
         }
         return cookies;

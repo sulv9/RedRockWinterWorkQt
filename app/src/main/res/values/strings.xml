@@ -20,4 +20,8 @@
     <string name="text_login_out">注销</string>
     <string name="tips_get_non">神木都没有呀~~~</string>
     <string name="text_searching">正在搜索中...</string>
+    <string name="tv_menu_share">Share</string>
+    <string name="tv_menu_like">love</string>
+    <string name="tv_menu_comment">Comment</string>
+    <string name="text_no_comments">评论功能暂未实现哦~~~</string>
 </resources>

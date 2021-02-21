@@ -3,6 +3,7 @@ package com.aefottt.redrockwinterworkqt.view.fragment;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -27,6 +28,7 @@ import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.data.bean.TreeBean;
 import com.aefottt.redrockwinterworkqt.presenter.ProjectPresenter;
 import com.aefottt.redrockwinterworkqt.util.Utility;
+import com.aefottt.redrockwinterworkqt.view.activity.ArticleActivity;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 import com.google.android.material.tabs.TabLayout;
 
@@ -164,6 +166,11 @@ public class ProjectFragment extends Fragment implements ProjectContract.view {
         adapter = new ArticleRecyclerAdapter(articleList);
         adapter.setRefreshView(refreshView);
         adapter.setFooterView(footerView);
+        adapter.setArticleListener(url->{
+            Intent intent = new Intent(getActivity(), ArticleActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        });
         rv.setAdapter(adapter);
     }
 

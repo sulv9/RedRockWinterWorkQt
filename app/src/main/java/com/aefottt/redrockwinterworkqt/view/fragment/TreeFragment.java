@@ -3,6 +3,7 @@ package com.aefottt.redrockwinterworkqt.view.fragment;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +26,7 @@ import com.aefottt.redrockwinterworkqt.data.bean.TreeChapterBean;
 import com.aefottt.redrockwinterworkqt.data.bean.TreeSuperChapterBean;
 import com.aefottt.redrockwinterworkqt.presenter.TreePresenter;
 import com.aefottt.redrockwinterworkqt.util.Utility;
+import com.aefottt.redrockwinterworkqt.view.activity.ArticleActivity;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 import com.google.android.material.tabs.TabLayout;
 
@@ -236,6 +238,11 @@ public class TreeFragment extends Fragment implements TreeContract.View {
         adapter = new ArticleRecyclerAdapter(articleList);
         adapter.setRefreshView(refreshView);
         adapter.setFooterView(null);
+        adapter.setArticleListener(url->{
+            Intent intent = new Intent(getActivity(), ArticleActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        });
         rvTree.setAdapter(adapter);
         rvTree.setOnTouchListener((v, e) -> {
             int y = (int) e.getRawY();

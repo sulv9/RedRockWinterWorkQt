@@ -1,5 +1,6 @@
 package com.aefottt.redrockwinterworkqt.view.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,6 +19,7 @@ import com.aefottt.redrockwinterworkqt.data.adapter.NaviTitleRecyclerAdapter;
 import com.aefottt.redrockwinterworkqt.data.adapter.NaviTreeRecyclerAdapter;
 import com.aefottt.redrockwinterworkqt.data.bean.NaviTreeBean;
 import com.aefottt.redrockwinterworkqt.presenter.NaviPresenter;
+import com.aefottt.redrockwinterworkqt.view.activity.WebActivity;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 
 import java.util.ArrayList;
@@ -173,6 +175,11 @@ public class NaviFragment extends Fragment implements NaviContract.view {
         rvLeft.setAdapter(treeAdapter);
         // 加载右栏数据
         NaviTitleRecyclerAdapter titleAdapter = new NaviTitleRecyclerAdapter(treeList);
+        titleAdapter.setArticleListener(url->{
+            Intent intent = new Intent(getActivity(), WebActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        });
         rvRight.setAdapter(titleAdapter);
     }
 

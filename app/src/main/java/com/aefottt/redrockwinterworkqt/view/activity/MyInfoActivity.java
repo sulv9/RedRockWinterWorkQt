@@ -3,6 +3,7 @@ package com.aefottt.redrockwinterworkqt.view.activity;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.aefottt.redrockwinterworkqt.R;
 import com.aefottt.redrockwinterworkqt.base.BaseActivity;
 import com.aefottt.redrockwinterworkqt.contract.MyInfoContract;
 import com.aefottt.redrockwinterworkqt.data.adapter.ArticleRecyclerAdapter;
+import com.aefottt.redrockwinterworkqt.data.adapter.CollectWebRecyclerAdapter;
 import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.data.bean.CollectWebBean;
 import com.aefottt.redrockwinterworkqt.presenter.MyInfoPresenter;
@@ -63,8 +65,10 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
     private TabLayout tbInfo;
     private RecyclerView rvInfo;
     private LinearLayoutManager manager;
-    private ArticleRecyclerAdapter adapter;
+    private ArticleRecyclerAdapter articleAdapter;
+    private CollectWebRecyclerAdapter webAdapter;
     private final ArrayList<ArticleBean> articleList = new ArrayList<>();
+    private final ArrayList<CollectWebBean> webList = new ArrayList<>();
     private MyInfoPresenter mPresenter;
 
     private View refreshView;
@@ -75,12 +79,8 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
     private ObjectAnimator anim;
     private int lastY;
     private final float mDragF = 0.4F;
-
-    enum RECYCLER_TYPE{
-        ARTICLE,
-        WEB,
-        COIN
-    }
+    private boolean noMoreData;
+    private boolean isRefreshing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +131,7 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
         });
         loginOut.setOnClickListener(view -> {
             PrefUtil.getInstance().clear(Utility.FILE_NAME_USER_INFO);
+            MyApplication.clearCookies();
             finish();
         });
     }
@@ -188,37 +189,76 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
                 // 加载收集文章数据
                 articleList.clear();
                 articleList.addAll(message.getData().getParcelableArrayList(BUNDLE_KEY_ARTICLE_DATA));
-                adapter = new ArticleRecyclerAdapter(articleList);
-                adapter.setRefreshView(refreshView);
-                adapter.setFooterView(footerView);
-                rvInfo.setAdapter(adapter);
-                addRecyclerSwipeListener(RECYCLER_TYPE.ARTICLE.ordinal());
+                articleAdapter = new ArticleRecyclerAdapter(articleList);
+                articleAdapter.setRefreshView(refreshView);
+                articleAdapter.setFooterView(footerView);
+                articleAdapter.setArticleListener(url -> {
+                    Intent intent = new Intent(MyInfoActivity.this, ArticleActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
+                });
+                rvInfo.setAdapter(articleAdapter);
+                if (isRefreshing){
+                    isRefreshing = false;
+                    animRefreshView(0, targetTop);
+                }
+                addRecyclerSwipeListener(0, articleList.size());
             } else if (message.what == WHAT_GET_MORE_ARTICLE_DATA) { //加载更多文章数据
                 int startPos = articleList.size() - 1;
                 ArrayList<ArticleBean> articleBeans = message.getData().getParcelableArrayList(BUNDLE_KEY_ARTICLE_DATA);
-                articleList.addAll(articleBeans);
-                adapter.notifyItemRangeChanged(startPos, articleBeans.size());
+                if (articleBeans.size() > 0) {
+                    noMoreData = false;
+                    articleList.addAll(articleBeans);
+                    articleAdapter.notifyItemRangeChanged(startPos, articleBeans.size());
+                } else {
+                    noMoreData = true;
+                    footerView.setVisibility(View.GONE);
+                }
             } else if (message.what == WHAT_GET_COLLECT_WEB_DATA) { //获取收藏网站列表
-                articleList.clear();
-                articleList.addAll(message.getData().getParcelableArrayList(BUNDLE_KEY_COLLECT_WEB_DATA));
-                adapter = new ArticleRecyclerAdapter(articleList);
-                adapter.setRefreshView(refreshView);
-                adapter.setFooterView(null);
-                rvInfo.setAdapter(adapter);
-                addRecyclerSwipeListener(RECYCLER_TYPE.WEB.ordinal());
+                webList.clear();
+                webList.addAll(message.getData().getParcelableArrayList(BUNDLE_KEY_COLLECT_WEB_DATA));
+                webAdapter = new CollectWebRecyclerAdapter(webList);
+                webAdapter.setRefreshView(refreshView);
+                webAdapter.setFooterView(footerView);
+                webAdapter.setArticleListener(url->{
+                    Intent intent = new Intent(MyInfoActivity.this, WebActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
+                });
+                rvInfo.setAdapter(webAdapter);
+                addRecyclerSwipeListener(3, webList.size());
+                if (isRefreshing){
+                    isRefreshing = false;
+                    animRefreshView(0, targetTop);
+                }
             } else if (message.what == WHAT_GET_COIN_LIST_DATA) { //加载积分获取列表数据
-                articleList.clear();
-                articleList.addAll(message.getData().getParcelableArrayList(BUNDLE_KEY_COIN_LIST_DATA));
-                adapter = new ArticleRecyclerAdapter(articleList);
-                adapter.setRefreshView(refreshView);
-                adapter.setFooterView(footerView);
-                rvInfo.setAdapter(adapter);
-                addRecyclerSwipeListener(RECYCLER_TYPE.COIN.ordinal());
+                webList.clear();
+                webList.addAll(message.getData().getParcelableArrayList(BUNDLE_KEY_COIN_LIST_DATA));
+                webAdapter = new CollectWebRecyclerAdapter(webList);
+                webAdapter.setRefreshView(refreshView);
+                webAdapter.setFooterView(footerView);
+                webAdapter.setArticleListener(url->{
+                    Intent intent = new Intent(MyInfoActivity.this, WebActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
+                });
+                rvInfo.setAdapter(webAdapter);
+                addRecyclerSwipeListener(1, webList.size());
+                if (isRefreshing){
+                    isRefreshing = false;
+                    animRefreshView(0, targetTop);
+                }
             } else if (message.what == WHAT_GET_MORE_COIN_LIST_DATA) { //加载更多积分获取列表
                 int startPos = articleList.size() - 1;
                 ArrayList<ArticleBean> coinListBeans = message.getData().getParcelableArrayList(BUNDLE_KEY_COIN_LIST_DATA);
-                articleList.addAll(coinListBeans);
-                adapter.notifyItemRangeChanged(startPos, coinListBeans.size());
+                if (coinListBeans.size() > 0) {
+                    noMoreData = false;
+                    articleList.addAll(coinListBeans);
+                    articleAdapter.notifyItemRangeChanged(startPos, coinListBeans.size());
+                } else {
+                    noMoreData = true;
+                    footerView.setVisibility(View.GONE);
+                }
             }
             return false;
         }
@@ -228,7 +268,7 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
      * 添加Recycler滑动监听事件，实现上滑加载更多
      */
     @SuppressLint("ClickableViewAccessibility")
-    private void addRecyclerSwipeListener(int type) {
+    private void addRecyclerSwipeListener(int type, int beanSize) {
         // 下拉刷新
         rvInfo.setOnTouchListener((v, e) -> {
             int y = (int) e.getRawY();
@@ -279,22 +319,19 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
             }
             return false;
         });
-        if (type == RECYCLER_TYPE.WEB.ordinal()){
-            return;
-        }
         rvInfo.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE || newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     int lastItem = manager.findLastCompletelyVisibleItemPosition();
-                    if (lastItem == manager.getItemCount() - 1) {
+                    if (lastItem == manager.getItemCount() - 1 && beanSize > 5 && !noMoreData) {
                         footerView.setVisibility(View.VISIBLE);
                         new Handler().postDelayed(() -> {
-                            if (type == RECYCLER_TYPE.ARTICLE.ordinal()) {
+                            if (type == 0) {
                                 mCurrentArticleList++;
                                 mPresenter.loadMoreArticleData(URL_COLLECT_ARTICLE_LIST_HEADER + mCurrentArticleList + URL_COLLECT_ARTICLE_LIST_TAIL);
-                            } else if (type == RECYCLER_TYPE.COIN.ordinal()){
+                            } else if (type == 1) {
                                 mCurrentCoinListPage++;
                                 mPresenter.loadMoreCoinListData(URL_COIN_LIST_HEADER + mCurrentCoinListPage + URL_COIN_LIST_TAIL);
                             }
@@ -403,16 +440,17 @@ public class MyInfoActivity extends BaseActivity implements MyInfoContract.view 
      */
     private void refreshing(int type) {
         tvRefresh.setText("正在刷新...");
+        isRefreshing = true;
         ivRefresh.setBackgroundResource(R.mipmap.load_refresh);
         // 开始刷新
-        if (type == RECYCLER_TYPE.ARTICLE.ordinal()){
+        if (type == 0) {
             mCurrentArticleList = 0;
-            mPresenter.loadCollectArticleData(URL_COLLECT_ARTICLE_LIST_HEADER+mCurrentArticleList+URL_COLLECT_ARTICLE_LIST_TAIL);
-        }else if (type == RECYCLER_TYPE.WEB.ordinal()){
-            mPresenter.loadCollectWebData(URL_COLLECT_WEB);
-        }else if (type == RECYCLER_TYPE.COIN.ordinal()){
+            mPresenter.loadCollectArticleData(URL_COLLECT_ARTICLE_LIST_HEADER + mCurrentArticleList + URL_COLLECT_ARTICLE_LIST_TAIL);
+        } else if (type == 1) {
             mCurrentCoinListPage = 1;
-            mPresenter.loadCollectCoinData(URL_COIN_LIST_HEADER+mCurrentCoinListPage+URL_COIN_LIST_TAIL);
+            mPresenter.loadMoreCoinListData(URL_COIN_LIST_HEADER + mCurrentCoinListPage + URL_COIN_LIST_TAIL);
+        }else {
+            mPresenter.loadCollectWebData(URL_COLLECT_WEB);
         }
     }
 

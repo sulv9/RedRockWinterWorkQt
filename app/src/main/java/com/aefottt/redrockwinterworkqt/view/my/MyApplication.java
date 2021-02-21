@@ -45,4 +45,8 @@ public class MyApplication extends Application {
     public static List<HttpCookie> getCookies() {
         return cookies;
     }
+
+    public static void clearCookies(){
+        cookies.clear();
+    }
 }

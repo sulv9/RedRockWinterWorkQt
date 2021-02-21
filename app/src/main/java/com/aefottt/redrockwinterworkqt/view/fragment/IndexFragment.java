@@ -2,6 +2,8 @@ package com.aefottt.redrockwinterworkqt.view.fragment;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +29,8 @@ import com.aefottt.redrockwinterworkqt.data.bean.ArticleBean;
 import com.aefottt.redrockwinterworkqt.data.bean.BannerBean;
 import com.aefottt.redrockwinterworkqt.presenter.IndexPresenter;
 import com.aefottt.redrockwinterworkqt.util.Utility;
+import com.aefottt.redrockwinterworkqt.view.activity.ArticleActivity;
+import com.aefottt.redrockwinterworkqt.view.activity.WebActivity;
 import com.aefottt.redrockwinterworkqt.view.my.MyApplication;
 
 import java.util.ArrayList;
@@ -235,18 +239,32 @@ public class IndexFragment extends Fragment implements IndexContract.View {
                 //将加载好的Banner数据传给Adapter
                 articleAdapter = new IndexArticleRecyclerAdapter(articleList, bannerList);
                 // 为adapter添加更新Banner回调监听
-                articleAdapter.setBannerListener((holder) -> {
-                    // 如果已经存在消息队列（旧消息队列）就将其移除
-                    if (handler.hasMessages(WHAT_AUTO_PLAY_BANNER)) {
-                        handler.removeMessages(WHAT_AUTO_PLAY_BANNER, tempMessageObj);
-                        tempMessageObj = null;
+                articleAdapter.setBannerListener(new IndexArticleRecyclerAdapter.BannerListener() {
+                    @Override
+                    public void sendAutoPlayHandler(IndexArticleRecyclerAdapter.ArticleViewHolder holder) {
+                        // 如果已经存在消息队列（旧消息队列）就将其移除
+                        if (handler.hasMessages(WHAT_AUTO_PLAY_BANNER)) {
+                            handler.removeMessages(WHAT_AUTO_PLAY_BANNER, tempMessageObj);
+                            tempMessageObj = null;
+                        }
+                        // 发送具有新绑定的holder的消息队列
+                        //TODO 注意：由于ViewHolder的缓存机制，每次Holder有一个属性（例如c7522de，不懂这是啥）都会改变，需要删除旧队列再新加新队列重新绑定Holder
+                        Message message2 = new Message();
+                        message2.what = WHAT_AUTO_PLAY_BANNER;
+                        message2.obj = holder;
+                        handler.sendMessageDelayed(message2, AUTO_PLAY_TIME);
                     }
-                    // 发送具有新绑定的holder的消息队列
-                    //TODO 注意：由于ViewHolder的缓存机制，每次Holder有一个属性（例如c7522de，不懂这是啥）都会改变，需要删除旧队列再新加新队列重新绑定Holder
-                    Message message2 = new Message();
-                    message2.what = WHAT_AUTO_PLAY_BANNER;
-                    message2.obj = holder;
-                    handler.sendMessageDelayed(message2, AUTO_PLAY_TIME);
+                    @Override
+                    public void onClickBanner(String url) {
+                        Intent intent = new Intent(getActivity(), WebActivity.class);
+                        intent.putExtra("url", url);
+                        startActivity(intent);
+                    }
+                });
+                articleAdapter.setArticleListener((url)->{
+                    Intent intent = new Intent(getActivity(), ArticleActivity.class);
+                    intent.putExtra("url", url);
+                    startActivity(intent);
                 });
                 // 设置Refresh布局
                 articleAdapter.setRefreshView(refreshView);
