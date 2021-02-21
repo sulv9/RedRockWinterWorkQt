@@ -30,8 +30,8 @@ public class HttpUtil {
                         URL url = new URL(address);
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");
-                        connection.setConnectTimeout(8000);
-                        connection.setReadTimeout(8000);
+                        connection.setConnectTimeout(1800);
+                        connection.setReadTimeout(1800);
                         // 开启CookieHandler线程
                         CookieHandler.setDefault(MyApplication.getCookieManager());
                         CookieStore cookieJar = MyApplication.getCookieManager().getCookieStore();
